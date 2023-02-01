@@ -1,6 +1,6 @@
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
-import { Route } from "src/core/router/Route";
+import { Route } from "src/core/router/route";
 import * as admin from "firebase-admin";
 
 const _newAdmin = admin.initializeApp(

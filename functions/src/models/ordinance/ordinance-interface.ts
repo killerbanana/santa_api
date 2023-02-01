@@ -14,7 +14,3 @@ export interface OrdinanceModel {
   created: string;
   updated: string;
 }
-
-export interface OrdinanceCreate {
-  sku: string;
-}

@@ -1,24 +1,33 @@
 import { firestore } from "firebase-admin";
 import PaginationQuery from "src/core/types/pagination-query";
 import { OrdinanceBuilder } from "src/models/ordinance/ordinance-builder";
-import {
-  OrdinanceCreate,
-  OrdinanceModel,
-} from "src/models/ordinance/ordinance-interface";
+import { OrdinanceModel } from "src/models/ordinance/ordinance-interface";
 import OrdinanceMethods from "src/models/ordinance/ordinance-method";
 
 class OrdinanceService {
-  static async create(data: OrdinanceCreate) {
-    //const { account } = data;
+  static async create(data: OrdinanceBuilder) {
     const batch = firestore().batch();
     const ordinanceRef = await OrdinanceMethods.createRef();
-    const teamBuy = new OrdinanceBuilder().setId(ordinanceRef.id);
-
-    batch.set(ordinanceRef.doc, Object.assign({}, teamBuy));
-
+    const ordinanceData = new OrdinanceBuilder({
+      id: ordinanceRef.doc.id,
+      ordinanceNumber: data.ordinanceNumber,
+      series: data.series.toString(),
+      date: data.date,
+      title: data.title,
+      author: data.author,
+      filePath: data.filePath,
+      time: data.time,
+      type: data.type,
+      size: data.size,
+      tag: data.tag,
+      reading: data.reading,
+      created: data.created,
+      updated: data.created,
+    });
+    batch.set(ordinanceRef.doc, Object.assign({}, ordinanceData));
     await batch.commit();
 
-    return { accountId: ordinanceRef.id };
+    return { ordinanceData };
   }
 
   static async getAll(pagination: PaginationQuery) {
@@ -46,32 +55,15 @@ class OrdinanceService {
     };
   }
 
-  // static async seed(data: any) {
-  //   data.data.map(async (data: any) => {
-  //     const batch = firestore().batch();
-  //     const cashloanRef = await OrdinanceMethods.createRef();
-  //     batch.set(
-  //       cashloanRef.doc,
-  //       Object.assign({
-  //         id: cashloanRef.doc.id,
-  //         author: data.Author,
-  //         created: data.Created,
-  //         date: data.Date,
-  //         ordinanceNumber: data.OrdinanceNumber,
-  //         path: "",
-  //         reading: data.Reading,
-  //         series: data.series,
-  //         size: data.Size,
-  //         time: data.time,
-  //         title: data.title,
-  //         type: ".pdf",
-  //         updated: data.Created,
-  //       })
-  //     );
-  //     console.log(cashloanRef.doc.id);
-  //     await batch.commit();
-  //   });
-  // }
+  static async seed(data: Array<OrdinanceBuilder>) {
+    data.map(async (data: OrdinanceBuilder) => {
+      const batch = firestore().batch();
+      const cashloanRef = await OrdinanceMethods.createRef();
+      batch.set(cashloanRef.doc, Object.assign({}, data));
+      console.log(cashloanRef.doc.id);
+      await batch.commit();
+    });
+  }
 }
 
 export default OrdinanceService;

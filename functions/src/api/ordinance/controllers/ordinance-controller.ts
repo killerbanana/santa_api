@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import OrinanceService from "../services/ordinance-service";
 import PaginationQuery from "src/core/types/pagination-query";
 import ORDINANCES from "src/ordinanceSeed.json";
-import { firestore } from "firebase-admin";
+import { OrdinanceBuilder } from "src/models/ordinance/ordinance-builder";
 import OrdinanceMethods from "src/models/ordinance/ordinance-method";
+import OrdinanceService from "../services/ordinance-service";
 //import Joi from "joi";
 
 class OrdinanceController {
@@ -11,16 +12,15 @@ class OrdinanceController {
     const { data } = req.body;
     try {
       const result = await OrinanceService.create(data);
-      console.log(result);
       return res.status(200).json({
         status: 200,
-        message: "Success",
+        message: "Orinances",
         data: result,
       });
     } catch (error) {
       return res.status(400).json({
         status: 400,
-        message: "Error adding account",
+        message: "Orinances",
         data: error,
       });
     }
@@ -57,44 +57,33 @@ class OrdinanceController {
   }
 
   static async seedOrdinance(req: Request, res: Response) {
-    for (const ordinanceData of ORDINANCES) {
-      const {
-        Author,
-        OrdinanceNumber,
-        Series,
-        Date,
-        Title,
-        Time,
-        Size,
-        Tag,
-        Reading,
-        Created,
-      } = ordinanceData;
-
-      const batch = firestore().batch();
+    var ordinance = [];
+    for (const ordi of ORDINANCES) {
       const cashloanRef = await OrdinanceMethods.createRef();
-      batch.set(
-        cashloanRef.doc,
-        Object.assign({
-          id: cashloanRef.doc.id,
-          author: Author,
-          created: Created,
-          date: Date,
-          ordinanceNumber: OrdinanceNumber.toString(),
-          path: "",
-          reading: Reading,
-          series: Series.toString(),
-          size: Size,
-          time: Time,
-          title: Title,
-          type: ".pdf",
-          tag: Tag,
-          updated: Created,
-        })
-      );
-      console.log(cashloanRef.doc.id);
-      await batch.commit();
+      const ordinanceData = new OrdinanceBuilder({
+        id: cashloanRef.doc.id,
+        ordinanceNumber: ordi.OrdinanceNumber.toString(),
+        series: ordi.Series.toString(),
+        date: ordi.Date,
+        title: ordi.Title,
+        author: ordi.Author,
+        filePath: "",
+        time: ordi.Time,
+        type: ".pdf",
+        size: ordi.Size,
+        tag: ordi.Tag,
+        reading: ordi.Reading,
+        created: ordi.Created,
+        updated: ordi.Created,
+      });
+      ordinance.push(ordinanceData);
     }
+    const result = await OrdinanceService.seed(ordinance);
+    return res.status(200).json({
+      status: 200,
+      message: "Orinances Seeded",
+      data: result,
+    });
   }
 }
 

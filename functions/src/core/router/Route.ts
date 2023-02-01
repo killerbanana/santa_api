@@ -3,8 +3,8 @@ import { Application, NextFunction, Request, Response } from "express";
 import routes from "src/api/routes";
 import App from "../App";
 import { errorHandlerWrapper } from "../middlewares/error-handler";
-import registerControllers from "./registerController";
-import registerMiddlewares from "./registerMiddlewares";
+import registerControllers from "./register-controller";
+import registerMiddlewares from "./register-middlewares";
 import registerValidators from "./register-validator";
 
 const _routes: Array<RoutesItem> = [];
