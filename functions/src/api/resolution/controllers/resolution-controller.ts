@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import OrdinanceService from "../services/ordinance-service";
+import ResolutionService from "../services/resolution-service";
 import PaginationQuery from "src/core/types/pagination-query";
-import ORDINANCES from "src/ordinanceSeed.json";
-import { OrdinanceBuilder } from "src/models/ordinance/ordinance-builder";
-import OrdinanceMethods from "src/models/ordinance/ordinance-method";
+import ResolutionS from "src/resolutionSeed.json";
+import { ResolutionBuilder } from "src/models/Resolution/Resolution-builder";
+import ResolutionMethods from "src/models/Resolution/Resolution-method";
 //import Joi from "joi";
 
-class OrdinanceController {
+class ResolutionController {
   static async create(req: Request, res: Response) {
     const { data } = req.body;
     try {
-      const result = await OrdinanceService.create(data);
+      const result = await ResolutionService.create(data);
       return res.status(200).json({
         status: 200,
         message: "Orinances",
@@ -40,28 +40,28 @@ class OrdinanceController {
     }
 
     try {
-      const result = await OrdinanceService.getAll(pagination);
+      const result = await ResolutionService.getAll(pagination);
       return res.status(200).json({
         status: 200,
-        message: "Orinances",
+        message: "Resolutions",
         data: result,
       });
     } catch (error) {
       return res.status(400).json({
         status: 400,
-        message: "Error getting ordinance",
+        message: "Error getting Resolution",
         data: error,
       });
     }
   }
 
-  static async seedOrdinance(req: Request, res: Response) {
-    var ordinance = [];
-    for (const ordi of ORDINANCES) {
-      const cashloanRef = await OrdinanceMethods.createRef();
-      const ordinanceData = new OrdinanceBuilder({
+  static async seedResolution(req: Request, res: Response) {
+    var Resolution = [];
+    for (const ordi of ResolutionS) {
+      const cashloanRef = await ResolutionMethods.createRef();
+      const ResolutionData = new ResolutionBuilder({
         id: cashloanRef.doc.id,
-        ordinanceNumber: ordi.OrdinanceNumber.toString(),
+        resolutionNumber: ordi.ResolutionNumber.toString(),
         series: ordi.Series.toString(),
         date: ordi.Date,
         title: ordi.Title,
@@ -75,9 +75,9 @@ class OrdinanceController {
         created: ordi.Created,
         updated: ordi.Created,
       });
-      ordinance.push(ordinanceData);
+      Resolution.push(ResolutionData);
     }
-    const result = await OrdinanceService.seed(ordinance);
+    const result = await ResolutionService.seed(Resolution);
     return res.status(200).json({
       status: 200,
       message: "Orinances Seeded",
@@ -86,4 +86,4 @@ class OrdinanceController {
   }
 }
 
-export default OrdinanceController;
+export default ResolutionController;
